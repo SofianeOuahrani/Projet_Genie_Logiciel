@@ -32,6 +32,7 @@ public abstract class BitPacking {
         }
 
         // nb de bits k pour maxVal
+        // https://www.geeksforgeeks.org/java/integer-numberofleadingzeros-method-in-java-with-example/
         this.k = (maxVal == 0) ? 1 : INT_BITS - Integer.numberOfLeadingZeros(maxVal);
         this.originalSize = input.length;
     }
