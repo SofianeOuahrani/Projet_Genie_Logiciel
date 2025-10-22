@@ -3,7 +3,45 @@ package gl.bp;
 public class BitPackingAligned extends BitPacking{
     @Override
     public int[] compress(int[] input) {
-        return new int[0];
+        // on calcule k (nb de bits de l'entier le plus grand tu tableau)
+        this.calculateK(input);
+
+        if (this.k == 0 ) {
+            return new int[0];
+        }
+        // maintenant on regarde combien d'entiers de k bits tiennent dans 32 bits
+        // j'ai mis final car cela ne changera pas
+        final int ITEMS_PER_CONTAINER = INT_BITS / this.k;
+
+        //on calcule la taille du tableau compressé sois le nb d'elts / le nombre d'éléments possible par conteneur de 32 bits
+        int compressedSize = (int) Math.ceil((double) this.originalSize / ITEMS_PER_CONTAINER);
+        int[] compressedArray = new int[compressedSize]; // tableau d'int de la taille que l'on vient de calculer
+
+        // Variables que j'utilise pour l'écriture
+        int outputIndex = 0; // Index du tableau de sortie
+        int bitOffset = 0;   // Décalage en bits dans compressedArray[outputIndex]
+
+        //boucle principale (inputVal = chaque valeur d'entrée)
+        for (int inputVal :input){
+            //on vérifie que le prochain paquet de k bits rentre dans le conteneur
+            //sinon bourrage et on passe au prochain conteneur
+            if(bitOffset + this.k > INT_BITS){
+                outputIndex++;
+                bitOffset = 0; // décalage remis à 0 car je passe au prochain conteneur
+            }
+
+            // Je dois écrire les bits de inputVal dans le compressedArray[outputIndex]
+
+            //CODE--------
+
+            // mise à jour du décalage (k bits ducoup)
+            bitOffset =+ this.k;
+        }
+
+
+        //tableau compressé final :)
+        return compressedArray;
+
     }
 
     @Override
@@ -13,7 +51,8 @@ public class BitPackingAligned extends BitPacking{
 
     @Override
     public int get(int[] compressedArray, int i) {
-
+        // j'utilise pas calculateK car le tableau étant deja compressé
+        //je suppose que this.k est donc initialisé logiquement.
         // = combien d'entiers compressés rentrent dans un entier de 32 bits
         int itemsPerContainer = INT_BITS / this.k;
 
@@ -34,6 +73,7 @@ public class BitPackingAligned extends BitPacking{
          efface donc tout les autres 1 pour ne garder que des 0 a gauche de notre nombre
          on obtiens finalement un entier de 32 bits qui ne contient que le nombre à l'indice voulu */
 
+        // web : bitwise operations
         int result = (compressedArray[indexContainer] >> (INT_BITS - this.k - bitOffset)) & ((1 << this.k) - 1);
         return result;
 
