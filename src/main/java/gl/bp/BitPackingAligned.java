@@ -9,15 +9,13 @@ public class BitPackingAligned extends BitPacking{
         if (this.k == 0 ) {
             return new int[0];
         }
-        // maintenant on regarde combien d'entiers de k bits tiennent dans 32 bits
-        // j'ai mis final car cela ne changera pas
+        // combien d'entiers de k bits tiennent dans 32 bits
         final int ITEMS_PER_CONTAINER = INT_BITS / this.k;
 
-        //on calcule la taille du tableau compressé sois le nb d'elts / le nombre d'éléments possible par conteneur de 32 bits
-        int compressedSize = (int) Math.ceil((double) this.originalSize / ITEMS_PER_CONTAINER); // div en flottant pour evite des trucs du genre 3/2 = 1
-        int[] compressedArray = new int[compressedSize]; // tableau d'int de la taille que l'on vient de calculer
+        int compressedSize = (int) Math.ceil((double) this.originalSize / ITEMS_PER_CONTAINER); // j'ai fais la div en flottant pour eviter des trucs du genre 3/2 = 1
+        int[] compressedArray = new int[compressedSize];
 
-        // Variables que j'utilise pour l'écriture
+        // Variables que j'utilise pour le suivi
         int outputIndex = 0; // Index du tableau de sortie
         int bitOffset = 0;   // Décalage en bits dans compressedArray[outputIndex]
 
@@ -56,6 +54,7 @@ public class BitPackingAligned extends BitPacking{
         int indexContainer = 0;
         int bitOffset = 0;
 
+
         for (int i = 0; i<this.originalSize;i++){
             if (bitOffset + this.k > INT_BITS){
                 indexContainer ++;
@@ -68,19 +67,15 @@ public class BitPackingAligned extends BitPacking{
             outputArray[i] = (compressedArray[indexContainer] >> decalage) & ((1 << this.k) - 1);
         }
 
-
-
-
-
-
+        //tableau décompressé final :)
         return outputArray;
     }
 
     @Override
     public int get(int[] compressedArray, int i) {
-        // j'utilise pas calculateK car le tableau est deja compressé
-        //je suppose que this.k est donc initialisé logiquement.
-        // = combien d'entiers compressés rentrent dans un entier de 32 bits
+        // j'utilise pas calculateK car le tableau est deja compres donc this.k est initialisé logiquement (#### -> voir si je throw pas une erreur ????)
+
+        // je pense que le nom est assez explicite..
         int itemsPerContainer = INT_BITS / this.k;
 
         // index du conteneur contenant l'entier i
@@ -95,7 +90,8 @@ public class BitPackingAligned extends BitPacking{
         /* isoler kbits qui nous intéresse dans le mot de 32 bit et le transformer en entier
          >> décale vers la droite par un nombre de positions que nous calculons pour que
          notre nombre soit tout à droite ( 32 bits - k bits - pos de départ)
-         + masque */
+         + masque ! (j'ai chois de soustraire 1 au masque pour n'avoir que des 1 pour touts les bits à droite, et ducoup on aura des
+         0 à gauche ce qui permettra d'ignorer les éventuels entiers a gauche de notre nombre (PB) */
 
         int decalage = INT_BITS - this.k - bitOffset;
         int result = (compressedArray[indexContainer] >> decalage) & ((1 << this.k) - 1);
