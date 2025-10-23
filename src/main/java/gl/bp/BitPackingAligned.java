@@ -29,7 +29,7 @@ public class BitPackingAligned extends BitPacking{
                 outputIndex++;
                 bitOffset = 0; // décalage remis à 0 car je passe au prochain conteneur
             }
-            
+
             // = distance entre le bit 0 à droite et le début du paquet
             int positionnement = INT_BITS - this.k - bitOffset;
 
@@ -49,7 +49,31 @@ public class BitPackingAligned extends BitPacking{
 
     @Override
     public int[] decompress(int[] compressedArray) {
-        return new int[0];
+
+        int[] outputArray = new int[this.originalSize];
+
+
+        int indexContainer = 0;
+        int bitOffset = 0;
+
+        for (int i = 0; i<this.originalSize;i++){
+            if (bitOffset + this.k > INT_BITS){
+                indexContainer ++;
+                bitOffset =0;
+            }
+            // decalage vers la droit pour amener les k bits au bit 0
+            int decalage = INT_BITS - this.k - bitOffset;
+
+            // décalage à droite
+            outputArray[i] = (compressedArray[indexContainer] >> decalage) & ((1 << this.k) - 1);
+        }
+
+
+
+
+
+
+        return outputArray;
     }
 
     @Override
@@ -68,13 +92,13 @@ public class BitPackingAligned extends BitPacking{
         // Position du bit de départ du i-ème élément (0 pour le bit de poids fort)
         int bitOffset = itemInContainer * this.k;
 
-        /* isoler kbits qui nous intéresse dans le mot de 32 bit et le transformer en entier -> Alignement + Nettoyage
+        /* isoler kbits qui nous intéresse dans le mot de 32 bit et le transformer en entier
          >> décale vers la droite par un nombre de positions que nous calculons pour que
          notre nombre soit tout à droite ( 32 bits - k bits - pos de départ)
-         & ... => applique ET binaire(&) avec un masque sur le résultat décalé
-         efface donc tout les autres 1 pour ne garder que des 0 a gauche de notre nombre*/
+         + masque */
 
-        int result = (compressedArray[indexContainer] >> (INT_BITS - this.k - bitOffset)) & ((1 << this.k) - 1);
+        int decalage = INT_BITS - this.k - bitOffset;
+        int result = (compressedArray[indexContainer] >> decalage) & ((1 << this.k) - 1);
         return result;
 
     }
