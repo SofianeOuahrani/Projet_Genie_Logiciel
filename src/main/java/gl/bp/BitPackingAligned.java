@@ -29,9 +29,7 @@ public class BitPackingAligned extends BitPacking{
                 outputIndex++;
                 bitOffset = 0; // décalage remis à 0 car je passe au prochain conteneur
             }
-
-            // Je dois écrire les bits de inputVal dans le compressedArray[outputIndex]
-
+            
             // = distance entre le bit 0 à droite et le début du paquet
             int positionnement = INT_BITS - this.k - bitOffset;
 
