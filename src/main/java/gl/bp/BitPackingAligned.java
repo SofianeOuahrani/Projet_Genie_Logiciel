@@ -14,7 +14,7 @@ public class BitPackingAligned extends BitPacking{
         final int ITEMS_PER_CONTAINER = INT_BITS / this.k;
 
         //on calcule la taille du tableau compressé sois le nb d'elts / le nombre d'éléments possible par conteneur de 32 bits
-        int compressedSize = (int) Math.ceil((double) this.originalSize / ITEMS_PER_CONTAINER);
+        int compressedSize = (int) Math.ceil((double) this.originalSize / ITEMS_PER_CONTAINER); // div en flottant pour evite des trucs du genre 3/2 = 1
         int[] compressedArray = new int[compressedSize]; // tableau d'int de la taille que l'on vient de calculer
 
         // Variables que j'utilise pour l'écriture
@@ -32,10 +32,15 @@ public class BitPackingAligned extends BitPacking{
 
             // Je dois écrire les bits de inputVal dans le compressedArray[outputIndex]
 
-            //CODE--------
+            // = distance entre le bit 0 à droite et le début du paquet
+            int positionnement = INT_BITS - this.k - bitOffset;
+
+            // je positionne le paquet par un décalage à gauche et je l'insère avec l'op OU binaire
+            compressedArray[outputIndex] |= (inputVal << positionnement);
+
 
             // mise à jour du décalage (k bits ducoup)
-            bitOffset =+ this.k;
+            bitOffset += this.k;
         }
 
 
@@ -51,7 +56,7 @@ public class BitPackingAligned extends BitPacking{
 
     @Override
     public int get(int[] compressedArray, int i) {
-        // j'utilise pas calculateK car le tableau étant deja compressé
+        // j'utilise pas calculateK car le tableau est deja compressé
         //je suppose que this.k est donc initialisé logiquement.
         // = combien d'entiers compressés rentrent dans un entier de 32 bits
         int itemsPerContainer = INT_BITS / this.k;
@@ -65,15 +70,12 @@ public class BitPackingAligned extends BitPacking{
         // Position du bit de départ du i-ème élément (0 pour le bit de poids fort)
         int bitOffset = itemInContainer * this.k;
 
-        /* isoler kbits qui nous intéresse dans le mot de 32 bit et le transformer en entier
-         Alignement puis Nettoyage
+        /* isoler kbits qui nous intéresse dans le mot de 32 bit et le transformer en entier -> Alignement + Nettoyage
          >> décale vers la droite par un nombre de positions que nous calculons pour que
-         notre nombre soit tout à droite
+         notre nombre soit tout à droite ( 32 bits - k bits - pos de départ)
          & ... => applique ET binaire(&) avec un masque sur le résultat décalé
-         efface donc tout les autres 1 pour ne garder que des 0 a gauche de notre nombre
-         on obtiens finalement un entier de 32 bits qui ne contient que le nombre à l'indice voulu */
+         efface donc tout les autres 1 pour ne garder que des 0 a gauche de notre nombre*/
 
-        // web : bitwise operations
         int result = (compressedArray[indexContainer] >> (INT_BITS - this.k - bitOffset)) & ((1 << this.k) - 1);
         return result;
 
