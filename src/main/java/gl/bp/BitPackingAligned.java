@@ -48,6 +48,10 @@ public class BitPackingAligned extends BitPacking{
     @Override
     public int[] decompress(int[] compressedArray) {
 
+        if (this.k == 0) {
+            throw new IllegalStateException("k n'est pas initialisé.");
+        }
+
         int[] outputArray = new int[this.originalSize];
 
 
@@ -65,6 +69,7 @@ public class BitPackingAligned extends BitPacking{
 
             // décalage à droite
             outputArray[i] = (compressedArray[indexContainer] >> decalage) & ((1 << this.k) - 1);
+            bitOffset += this.k;
         }
 
         //tableau décompressé final :)
@@ -73,7 +78,10 @@ public class BitPackingAligned extends BitPacking{
 
     @Override
     public int get(int[] compressedArray, int i) {
-        // j'utilise pas calculateK car le tableau est deja compres donc this.k est initialisé logiquement (#### -> voir si je throw pas une erreur ????)
+
+        if (this.k == 0) {
+            throw new IllegalStateException("k n'est pas initialisé.");
+        }
 
         // je pense que le nom est assez explicite..
         int itemsPerContainer = INT_BITS / this.k;
