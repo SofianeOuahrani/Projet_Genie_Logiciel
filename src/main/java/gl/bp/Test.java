@@ -1,5 +1,8 @@
 package gl.bp;
+/*je vais coder plus tard si j'ai le temps une partie de Test auto
+avec des tableau d'int générés aléatoirement */
+public class Test {
 
-// a faire !
-public class BitPackingTests {
+    public static void main(String[] args) {
+    }
 }

@@ -6,7 +6,7 @@ public abstract class BitPacking {
     protected int k;
     protected int originalSize;
 
-    // --- methodes abs
+    // methodes abstraites
 
     public abstract int[] compress(int[] input);
 
@@ -14,7 +14,7 @@ public abstract class BitPacking {
 
     public abstract int get(int[] compressedArray, int i);
 
-    // --- methodes partagées
+    // methodes partagées
 
     protected void calculateK(int[] input) {
         if (input == null || input.length == 0) {
@@ -25,19 +25,19 @@ public abstract class BitPacking {
 
         int maxVal = 0;
         for (int val : input) {
+
             // je n'ai pas choisi d'évaluer les nombre négatifs (bonus) pour l'instant.
             if (val > maxVal) {
                 maxVal = val;
             }
         }
 
-        // nb de bits k pour maxVal
         // https://www.geeksforgeeks.org/java/integer-numberofleadingzeros-method-in-java-with-example/
         this.k = (maxVal == 0) ? 1 : INT_BITS - Integer.numberOfLeadingZeros(maxVal);
         this.originalSize = input.length;
     }
 
-    // --- méthodes + chrono
+    // méthodes + chrono
 
     public long timeCompress(int[] input) {
         long start = System.nanoTime();
