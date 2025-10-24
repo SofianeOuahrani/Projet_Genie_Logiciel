@@ -1,20 +1,91 @@
 package gl.bp;
 
+
 public class BitPackingOverlap extends BitPacking {
 
     @Override
     public int[] compress(int[] input) {
-        this.calculateK(input);
-        if (this.k == 0 ) {
+        this.calculateK(input); //0 si vide
+        final int K = this.k;
+        if (K == 0 ) {
             return new int[0];
         }
-        return null;
+        long nbBits = (long) this.originalSize * K;
+        int tailleTab = (int) Math.ceil((double)nbBits / INT_BITS);
 
+        int[] outputArray = new int[tailleTab];
+
+        int outputIndex = 0; //Index conteneur
+        int bitOffset = 0; //décalage depuis la gauche
+
+        for(int inputVal : input){
+
+            //le cas ou tout est beau dans la vie
+            if (bitOffset + K <= INT_BITS) {
+
+                int positionnement = INT_BITS - K - bitOffset;
+                outputArray[outputIndex] |=  (inputVal << (positionnement)) ;
+
+                bitOffset += K;
+
+                //PB : j'avais oublié d'incrémenter outputindex quand le decal == 32
+                if (bitOffset == INT_BITS) {
+                    outputIndex++;
+                    bitOffset = 0;
+                }
+            }
+            //chevauchement ;(
+            else {
+                // les 2 parties de mon paquet a découper
+                int bits1 = INT_BITS - bitOffset; // pour le conteneur actuel
+                int bits2 = K - bits1;           // pour le suivant
+
+                // 1) insertion premiere partie
+
+                // je masque les bits de poids faible
+                int valPartie1 = inputVal;
+                valPartie1 = valPartie1 >> bits2;
+                valPartie1 = valPartie1 << bits2;
+
+                int positionnement1 = INT_BITS - bits1 - bitOffset;
+
+                outputArray[outputIndex] |= (valPartie1 << positionnement1);
+
+
+                // conten. suivant
+                outputIndex++;
+
+                // 2) insertion deuxieme partie
+
+                // doit commencer tt a gauche !!!
+                int positionnement2 = INT_BITS - bits2;
+
+                // masque bit poids faible
+                int masquePartie2 = (1 << bits2) - 1;
+                int valPartie2 = inputVal & masquePartie2;
+
+                outputArray[outputIndex] |= (valPartie2 << positionnement2);
+
+                bitOffset = bits2; //!!!
+            }
+        }
+        return outputArray;
     }
 
     @Override
     public int[] decompress(int[] compressedArray) {
-        return null;
+        if (this.originalSize == 0){
+            return new int[0];
+        }
+        if (this.k == 0) {
+            throw new IllegalStateException("k n'est pas initialisé.");
+        }
+        int[] outputArray = new int[this.originalSize];
+
+        for(int i = 0; i < this.originalSize; i++) {
+            outputArray[i] = get(compressedArray,i);
+        }
+        return outputArray;
     }
 
     @Override
@@ -28,7 +99,7 @@ public class BitPackingOverlap extends BitPacking {
         final int K = this.k;
         final int MASK_K_BITS = (1 << K) - 1; //masque de k bits (pour isoler note entier ducoup)
 
-        int bitPosition = i * K;
+        long bitPosition = (long) i * K;
 
         // pour trouver le conteneur de départ et le décalage
         int indexContainer = (int) (bitPosition/INT_BITS);
