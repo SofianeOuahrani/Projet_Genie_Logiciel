@@ -1,4 +1,4 @@
-// Classe BitPackingAligned - OUAHRANI KHALDI Sofiane
+// BitPackingAligned - OUAHRANI KHALDI Sofiane
 package gl.bp;
 
 public class BitPackingAligned extends BitPacking {
@@ -79,7 +79,7 @@ public class BitPackingAligned extends BitPacking {
 
         // c'est pas cool on stop direct
         if (K == 0) {
-            throw new IllegalStateException("k n'est pas initialisé : merci d'appeler compress() sur le tableau d'abord.");
+            throw new IllegalStateException("k n'est pas initialisé : merci d'appeler compress() sur le tableau d'abord./ tableau vide");
         }
 
 
