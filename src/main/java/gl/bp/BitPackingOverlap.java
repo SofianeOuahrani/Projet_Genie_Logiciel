@@ -64,12 +64,8 @@ public class BitPackingOverlap extends BitPacking {
 
     @Override
     public int[] decompress(int[] compressedArray) {
-        if (this.originalSize == 0){
-            return new int[0];
-        }
-
         if (this.k == 0) {
-            throw new IllegalStateException("k n'est pas initialisé.");
+            return new int[0];
         }
         int[] outputArray = new int[this.originalSize];
 
