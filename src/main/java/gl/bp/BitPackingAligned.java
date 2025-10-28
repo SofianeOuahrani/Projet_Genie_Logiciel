@@ -47,7 +47,7 @@ public class BitPackingAligned extends BitPacking {
     public int[] decompress(int[] compressedArray) {
         int K = this.k;
 
-        // CAS OU K n'est pas init !!!
+        // CAS OU K == 0 (tab vide ou pas init)
         if (K == 0) {
             return new int[0];
         }
