@@ -49,24 +49,14 @@ public class BitPackingAligned extends BitPacking {
 
         // CAS OU K n'est pas init !!!
         if (K == 0) {
-            throw new IllegalStateException("k n'est pas initialisé : merci d'appeler compress() sur le tableau d'abord.");
+            return new int[0];
         }
 
         int[] outputArray = new int[this.originalSize];
 
-        int indexContainer = 0;
-        int bitOffset = 0;
-
+        //comme dans mes autres classes je vais juste appeler get pour chaque indice
         for (int i = 0; i < this.originalSize; i++) {
-            if (bitOffset + K > INT_BITS) { //dès que c le cas soit padding soit tout lus
-                indexContainer++;
-                bitOffset = 0;
-            }
-
-
-            // décalage à droite
-            outputArray[i] = (compressedArray[indexContainer] >>> bitOffset) & ((1 << K) - 1); //décalage a droite et isolement avec masque pour avoir des zéro partout sauf mon int
-            bitOffset += K;
+            outputArray[i] = get(compressedArray, i);
         }
 
         //tableau décompressé final :)
