@@ -37,23 +37,40 @@ public abstract class BitPacking {
         this.originalSize = input.length;
     }
 
-    // méthodes + chrono
 
-    public long timeCompress(int[] input) {
-        long start = System.nanoTime();
-        compress(input);
-        return System.nanoTime() - start;
+    //je vais utiliser une classe générique pour renvoyer un tableau contenant le résultat de l'opération et le temps que ça prend
+    //car avant ça je faisais deux compressions pour rien dans mon main pour le benchmark
+    // https://www.jmdoudoux.fr/java/dej/chap-generique.htm
+    public class ResultWithTime<T> {
+        public final T result;
+        public final long timeNs;
+
+        public ResultWithTime(T result, long timeNs) {
+            this.result = result;
+            this.timeNs = timeNs;
+        }
     }
 
-    public long timeDecompress(int[] compressedArray) {
+
+    public ResultWithTime<int[]> timeCompress(int[] input) {
         long start = System.nanoTime();
-        decompress(compressedArray);
-        return System.nanoTime() - start;
+        int[] compressed = compress(input);
+        long end = System.nanoTime();
+        return new ResultWithTime<>(compressed, end - start);
     }
 
-    public long timeGet(int[] compressedArray, int i) {
+    public ResultWithTime<int[]> timeDecompress(int[] compressedArray) {
         long start = System.nanoTime();
-        get(compressedArray, i);
-        return System.nanoTime() - start;
+        int[] decompressed = decompress(compressedArray);
+        long end = System.nanoTime();
+        return new ResultWithTime<>(decompressed, end - start);
     }
+
+    public ResultWithTime<Integer> timeGet(int[] compressedArray, int i) {
+        long start = System.nanoTime();
+        int value = get(compressedArray, i);
+        long end = System.nanoTime();
+        return new ResultWithTime<>(value, end - start);
+    }
+
 }
