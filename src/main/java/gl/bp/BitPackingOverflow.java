@@ -364,4 +364,17 @@ public class BitPackingOverflow extends BitPacking {
             return readOverlap(compressedArray, this.k_overflow, state);
         }
     }
+
+    //getters pour les benchmarks
+    public int getKPrime() {
+        return this.k_prime;
+    }
+
+    public int getKOverflow() {
+        return this.k_overflow;
+    }
+
+    public int getOverflowStartIntIndex() {
+        return this.overflow_start_index;
+    }
 }

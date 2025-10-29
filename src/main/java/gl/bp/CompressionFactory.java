@@ -1,4 +1,4 @@
-// BitPackingOverlap - OUAHRANI KHALDI Sofiane
+// BitPackingFactory - OUAHRANI KHALDI Sofiane
 package gl.bp;
 
 // Factory pour créer et gérer les différentes implémentations de BitPacking.
