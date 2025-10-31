@@ -1,3 +1,4 @@
+// BitPacking - OUAHRANI KHALDI Sofiane
 package gl.bp;
 
 public abstract class BitPacking {
@@ -39,7 +40,7 @@ public abstract class BitPacking {
 
 
     //je vais utiliser une classe générique pour renvoyer un tableau contenant le résultat de l'opération et le temps que ça prend
-    //car avant ça je faisais deux compressions pour rien dans mon main pour le benchmark
+    //car avant ça je faisais deux compressions pour rien dans mon main pour le benchmark (une pour la compression et une pour afficher le temps de celle-ci soit 2 compressions)
     // https://www.jmdoudoux.fr/java/dej/chap-generique.htm
     public class ResultWithTime<T> {
         public final T result;
@@ -51,7 +52,7 @@ public abstract class BitPacking {
         }
     }
 
-
+    //resultat + temps de l'op de compress
     public ResultWithTime<int[]> timeCompress(int[] input) {
         long start = System.nanoTime();
         int[] compressed = compress(input);
@@ -59,6 +60,7 @@ public abstract class BitPacking {
         return new ResultWithTime<>(compressed, end - start);
     }
 
+    // résultat + temps de l'op de decompress
     public ResultWithTime<int[]> timeDecompress(int[] compressedArray) {
         long start = System.nanoTime();
         int[] decompressed = decompress(compressedArray);
@@ -66,6 +68,7 @@ public abstract class BitPacking {
         return new ResultWithTime<>(decompressed, end - start);
     }
 
+    // resultat + temps de l'op get
     public ResultWithTime<Integer> timeGet(int[] compressedArray, int i) {
         long start = System.nanoTime();
         int value = get(compressedArray, i);
