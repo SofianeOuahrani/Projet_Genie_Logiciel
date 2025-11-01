@@ -6,12 +6,18 @@ public class BitPackingAligned extends BitPacking {
     public int[] compress(int[] input) {
 
         this.calculateK(input); //mtn k est init
+        int K = this.k; // juste pour plus de lisibilité
 
-        if (this.k == 0 ) {
+        if (K == 0 ) {
             return new int[0]; // au cas ou le tableau est vide
         }
+        //si un seul elt rentre par conteneur
+        else if (K > INT_BITS / 2) {
+            //ma petite optimisation du soir
+            return input;
+        }
 
-        int K = this.k; // juste pour plus de lisibilité
+
 
         final int ITEMS_PER_CONTAINER = INT_BITS / K;
 

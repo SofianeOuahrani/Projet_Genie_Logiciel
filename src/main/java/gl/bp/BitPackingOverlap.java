@@ -12,6 +12,10 @@ public class BitPackingOverlap extends BitPacking {
         if (K == 0 ) {
             return new int[0];
         }
+        else if (K == INT_BITS) {
+            // ma deuxieme optimisation du soir :)
+            return input;
+        }
 
         long nbBits = (long) this.originalSize * K; //nb de bits nécessaires pour tt les entiers
         int tailleTab = (int) Math.ceil((double)nbBits / INT_BITS); // div par paquets de 32 bits
