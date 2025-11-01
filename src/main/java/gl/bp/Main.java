@@ -44,7 +44,7 @@ public class Main {
                     case "2":
                         runBenchmark(scanner);
                         break;
-                    case "q": //### option quitter
+                    case "q": //option quitter
                         running = false;
                         System.out.println("\n Fin du programme. Merci pour votre attention !");
                         break;
@@ -200,25 +200,53 @@ public class Main {
         int testNum = 1; //num du test
         for (int i = 0; i < sizes.length; i++) {
             int size = sizes[i];
-            int randomMaxValue = rand.nextInt(MAX_RANDOM_MAX_VALUE - MIN_RANDOM_MAX_VALUE + 1) + MIN_RANDOM_MAX_VALUE;
-            int[] data = generateRandomData(size, randomMaxValue);
 
-            long originalBytes = (long) data.length * (INT_BITS / 8);
-            double timeStd_ns = calculateTransmissionTime(originalBytes);
+            //CAS 1 : Petits nombres uniquement
+            int maxSmall = 255; // valeurs très faibles
+            int[] dataSmall = generateRandomData(size, maxSmall);
 
-            System.out.printf("\n=== TEST #%d | Taille : %,d éléments | MaxVal : %,d ===\n",
-                    testNum++, size, randomMaxValue);
-            System.out.printf("=> Taille originale : %,d octets\n", originalBytes);
-            System.out.printf("=> Temps de transmission standard : %,.0f ns\n", timeStd_ns);
+            //CAS 2 : Petits + grands nombres
+            int[] dataMixed = generateRandomData(size, maxSmall);
+            if (size > 0) {
+                // on insère quelques grands nombres aléatoires
+                for (int j = 0; j < Math.max(1, size / 20); j++) {
+                    int idx = rand.nextInt(size);
+                    dataMixed[idx] = rand.nextInt(MAX_RANDOM_MAX_VALUE); // très grande valeur
+                }
+            }
 
-            for (String type : modes) { //pour chaque mode
-                BitPacking compressor = CompressionFactory.createCompressor(type);
-                runDiagnostic(compressor, type, data, randomMaxValue, timeStd_ns);
+            //CAS 3 : Grands nombres uniquement
+            int maxLarge = MAX_RANDOM_MAX_VALUE;
+            int[] dataLarge = generateRandomData(size, maxLarge);
 
-                try {
-                    Thread.sleep(150); //sinon ça devient vite le "bordel" pour lire
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            //On regroupe ces trois cas dans une liste pour les tester successivement. J'ai choisi une hashmap pour un affichage simplifié et regroupé.
+            Map<String, int[]> cases = new LinkedHashMap<>();
+            cases.put("Petits nombres uniquement", dataSmall);
+            cases.put("Petits + Grands nombres", dataMixed);
+            cases.put("Grands nombres uniquement", dataLarge);
+
+            for (Map.Entry<String, int[]> entry : cases.entrySet()) {
+                String caseName = entry.getKey();
+                int[] data = entry.getValue();
+                int currentMaxValue = Arrays.stream(data).max().orElse(0);
+
+                long originalBytes = (long) data.length * (INT_BITS / 8);
+                double timeStd_ns = calculateTransmissionTime(originalBytes);
+
+                System.out.printf("\n=== TEST #%d | Taille : %,d éléments | %s | MaxVal : %,d ===\n",
+                        testNum++, size, caseName, currentMaxValue);
+                System.out.printf("=> Taille originale : %,d octets\n", originalBytes);
+                System.out.printf("=> Temps de transmission standard : %,.0f ns\n", timeStd_ns);
+
+                for (String type : modes) { //pour chaque mode
+                    BitPacking compressor = CompressionFactory.createCompressor(type);
+                    runDiagnostic(compressor, type, data, currentMaxValue, timeStd_ns);
+
+                    try {
+                        Thread.sleep(150); //sinon ça devient vite le "bordel" pour lire
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
 
@@ -239,6 +267,7 @@ public class Main {
         //retour au menu principal automatique
         System.out.println("\n Retour au menu principal...");
     }
+
 
 
     //exec les calculs et l'analyse de la rentabilité pour un mode en particulier choisi
