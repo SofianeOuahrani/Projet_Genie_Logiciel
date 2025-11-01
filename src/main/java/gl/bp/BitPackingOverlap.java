@@ -54,7 +54,7 @@ public class BitPackingOverlap extends BitPacking {
 
                 // 2) insertion deuxieme partie
                 int valPartie2 = inputVal >>> bits1; //le reste des bits
-                outputArray[outputIndex] |= valPartie2; // et la pas besoin de décalage, ils commencent à gauche :)
+                outputArray[outputIndex] |= valPartie2; // et la pas besoin de décalage.
 
                 bitOffset = bits2;
             }

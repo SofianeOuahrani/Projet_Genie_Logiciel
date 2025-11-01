@@ -192,7 +192,7 @@ public class Main {
 
         Random rand = new Random(); //un peu de hasard
 
-        int[] sizes = {1_000, 50_000, 1_000_000};
+        int[] sizes = {10, 100, 1_000, 50_000, 1_000_000};
 
         System.out.printf("Exécution de tests complets sur %d tailles de tableaux : %s\n",
                 sizes.length, Arrays.toString(sizes));

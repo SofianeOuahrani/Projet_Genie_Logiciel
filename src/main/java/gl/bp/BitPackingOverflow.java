@@ -365,16 +365,8 @@ public class BitPackingOverflow extends BitPacking {
         }
     }
 
-    //getters pour les benchmarks
+    //getter pour benchmark
     public int getKPrime() {
         return this.k_prime;
-    }
-
-    public int getKOverflow() {
-        return this.k_overflow;
-    }
-
-    public int getOverflowStartIntIndex() {
-        return this.overflow_start_index;
     }
 }
